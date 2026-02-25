@@ -1,28 +1,26 @@
-from src import config
+from src.api import UserApi, OrderApi, IngredientsApi
+
 
 def register_user(client, payload):
-    return client.request("POST", config.REGISTER, json=payload)
+    return UserApi(client).register(payload)
 
 def login_user(client, email, password):
-    return client.request("POST", config.LOGIN, json={"email": email, "password": password})
+    return UserApi(client).login(email, password)
 
 def auth_headers(access_token: str):
     return {"Authorization": access_token}
 
 def patch_user(client, access_token: str, payload):
-    return client.request("PATCH", config.USER, headers=auth_headers(access_token), json=payload)
+    return UserApi(client).patch(access_token, payload)
 
 def delete_user(client, access_token: str):
-    return client.request("DELETE", config.USER, headers=auth_headers(access_token))
+    return UserApi(client).delete(access_token)
 
 def get_ingredients(client):
-    return client.request("GET", config.INGREDIENTS)
+    return IngredientsApi(client).get()
 
 def create_order(client, ingredient_ids=None, access_token=None):
-    headers = {"Authorization": access_token} if access_token else None
-    json_body = {"ingredients": ingredient_ids} if ingredient_ids is not None else {}
-    return client.request("POST", config.ORDERS, headers=headers, json=json_body)
+    return OrderApi(client).create(ingredient_ids=ingredient_ids, access_token=access_token)
 
 def get_user_orders(client, access_token=None):
-    headers = {"Authorization": access_token} if access_token else None
-    return client.request("GET", config.ORDERS, headers=headers)
+    return OrderApi(client).get_user_orders(access_token=access_token)
